@@ -80,6 +80,7 @@
   <script>
     function passRollNumber() {
       const username = document.getElementById("username").value;
+      console.log(username);
       const url = `question.html?roll=${encodeURIComponent(username)}`;
       window.location.href = url;
       return false; 
