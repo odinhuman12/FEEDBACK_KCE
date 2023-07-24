@@ -32,7 +32,7 @@ app.post("/auth-student",(req,res)=>{
     res.send("Request received");
 });
 
-
+console.log("hello");
 //admin portal
 app.get("/admin",(req,res)=>{
     res.render('adlogin',{message:''});
