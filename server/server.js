@@ -56,7 +56,9 @@ app.post("/auth-admin",(req,res)=>{
 
 
 //read excel
-
+app.post('/save',(req,res)=>{
+    console.log(req.body);
+})
 
 
 
