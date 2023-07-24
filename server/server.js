@@ -4,6 +4,14 @@ const bodyParser = require('body-parser');
 const dotenv = require("dotenv").config();
 const path = require('path');
 const app = express(); //instance of express application
+const fs=require('fs');
+const multer=require('multer');
+const csvParser=require('csv-parser');
+
+
+
+const upload=multer({dest:'uploads'});
+
 
 //telling express to serve static files from public folder
 app.use(express.static(path.join(__dirname, 'public/images')));
@@ -56,8 +64,8 @@ app.post("/auth-admin",(req,res)=>{
 
 
 //read excel
-app.post('/save',(req,res)=>{
-    console.log(req.body);
+app.post('/save',upload.single('csvfile'),(req,res)=>{
+    console.log('done');
 })
 
 
@@ -69,19 +77,6 @@ app.listen(process.env.PORT,()=>{
 });
 
 
-//utilities
-
-const userExists = (username) =>{
-    console.log("inside fn");
-    db.query(`SELECT username FROM auth WHERE username = '${username}'`,(err,res)=>{
-
-        if(err) console.log(err);
-        else{
-            if(res.length == 0) return false; //user doesn't exists
-            else return true;;
-        }
-    })
-};
 
 
 
