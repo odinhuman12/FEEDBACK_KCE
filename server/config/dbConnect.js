@@ -21,13 +21,37 @@ async function closeConnection(connection) {
 
 async function insertCSVData(connection, csvData) {
   try {
+    let cols = Object.keys(csvData[0]).join(' VARCHAR(30), ');
+    cols = cols.concat(" VARCHAR(30) ");
+    // console.log(cols);
+    //dropping the old table
+    await new Promise((resolve,reject)=>{
+      connection.query('DROP TABLE IF EXISTS student_data',(err,rs)=>{
+        if(err) reject(err);
+        else resolve(rs);
+      });
+    });
+
+    //creating table
+    await new Promise((resolve,reject)=>{
+      connection.query(`CREATE TABLE student_data(${cols})`,(err,rs)=>{
+        if(err) reject(err);
+        else{
+          // console.log(rs);
+          resolve(rs);
+        } 
+      });
+    });
+    console.log("Table created");
+
+
     // Prepare the INSERT query with placeholders
     const columns = Object.keys(csvData[0]).join(', ');
     const valuesPlaceholders = csvData[0] ? csvData[0] : {};
     const placeholders = Object.keys(valuesPlaceholders).map(() => '?').join(', ');
     // console.log(columns);
     // console.log(placeholders);
-    const insertQuery = `INSERT INTO test (${columns}) VALUES (${placeholders})`;
+    const insertQuery = `INSERT INTO student_data (${columns}) VALUES (${placeholders})`;
 
   for (const row of csvData) {
       const values = Object.values(row);

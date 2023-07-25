@@ -72,6 +72,7 @@ app.post('/save',upload.single('csvfile'),async(req,res)=>{
    
     //parsing the csv
     const csvData = []
+    try{
     fs.createReadStream(req.file.path) //creating a stream
       .pipe(csvParser()) //piping that stream
       .on('data',(data)=>{ //reading data one by one
@@ -82,6 +83,9 @@ app.post('/save',upload.single('csvfile'),async(req,res)=>{
         await saveData(csvData);
       });
     res.render('dashboard',{message:'uploaded'})
+    }catch(err){
+        res.render('dashboard',{message:'Please select a file'})
+    }
 });
 
 
