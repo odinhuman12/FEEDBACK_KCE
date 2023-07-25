@@ -1,23 +1,56 @@
-
 const mysql = require('mysql2');
+
 
 const dbConfig = {
   host: 'localhost',
   user: 'root',
-  password: '20f110', 
+  password: 'Mysql26!', 
   database: 'feedback_app',
 };
+async function createConnection() {
+  const connection = mysql.createConnection(dbConfig);
+  return connection;
+}
 
-const pool = mysql.createPool(dbConfig);
+// Function to close the MySQL database connection
+async function closeConnection(connection) {
+  await connection.end();
+}
 
-// Test the database connection
-pool.getConnection((err, connection) => {
-  if (err) {
-    console.error('Error connecting to the database:', err.message);
-  } else {
-    console.log('Connected to the database!');
-    connection.release();
+
+
+async function insertCSVData(connection, csvData) {
+  try {
+    // Prepare the INSERT query with placeholders
+    const columns = Object.keys(csvData[0]).join(', ');
+    const valuesPlaceholders = csvData[0] ? csvData[0] : {};
+    const placeholders = Object.keys(valuesPlaceholders).map(() => '?').join(', ');
+    // console.log(columns);
+    // console.log(placeholders);
+    const insertQuery = `INSERT INTO test (${columns}) VALUES (${placeholders})`;
+
+  for (const row of csvData) {
+      const values = Object.values(row);
+    // Insert the data into the MySQL table using the prepared INSERT query
+    await new Promise((resolve, reject) => {
+      connection.query(insertQuery, values , (error, results) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(results);
+        }
+      });
+    });
   }
-});
 
-module.exports = pool;
+    console.log('CSV data inserted into MySQL table successfully.');
+  } catch (error) {
+    console.error('Error inserting CSV data into MySQL:', error);
+  }
+}
+
+module.exports = {
+  createConnection,
+  closeConnection,
+  insertCSVData,
+};

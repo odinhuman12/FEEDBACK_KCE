@@ -1,16 +1,20 @@
 const express = require("express");
-const db= require("./config/dbConnect")
+const conn = require("./config/dbConnect")
 const bodyParser = require('body-parser');
 const dotenv = require("dotenv").config();
 const path = require('path');
 const app = express(); //instance of express application
-const fs=require('fs');
-const multer=require('multer');
-const csvParser=require('csv-parser');
+const fs = require('fs');
+const multer = require('multer');
+const csvParser = require('csv-parser');
 
 
-
-const upload=multer({dest:'uploads'});
+async function getConn(){
+   const db = await conn.createConnection();
+   console.log("Database connected!")
+   return db;
+}
+const upload=multer({dest:'uploads/'}); //specifying the destination folder
 
 
 //telling express to serve static files from public folder
@@ -25,8 +29,9 @@ app.get("/login",(req,res)=>{
     res.render('stlogin',{message:''});
 });
 
-app.post("/auth-student",(req,res)=>{
+app.post("/auth-student",async(req,res)=>{
     const {username,password} = req.body;
+    const db = await getConn();
     db.query('SELECT * FROM auth WHERE username = ?',[username],(err,res)=>{
         if(err) console.log(err);
         
@@ -40,16 +45,15 @@ app.post("/auth-student",(req,res)=>{
     res.send("Request received");
 });
 
-console.log("hello");
 //admin portal
 app.get("/admin",(req,res)=>{
     res.render('adlogin',{message:''});
 });
 
 //authenticate admin
-app.post("/auth-admin",(req,res)=>{
+app.post("/auth-admin",async(req,res)=>{
     const {username,password} = req.body;
-
+    const db = await getConn();
     db.query('SELECT * FROM auth WHERE username = ?',[username],(err,rs)=>{
         if(err) console.log(err);
         
@@ -64,12 +68,37 @@ app.post("/auth-admin",(req,res)=>{
 
 
 //read excel
-app.post('/save',upload.single('csvfile'),(req,res)=>{
-    console.log('done');
-})
+app.post('/save',upload.single('csvfile'),async(req,res)=>{
+   
+    //parsing the csv
+    const csvData = []
+    fs.createReadStream(req.file.path) //creating a stream
+      .pipe(csvParser()) //piping that stream
+      .on('data',(data)=>{ //reading data one by one
+        csvData.push(data);
+      })
+      .on('end',async ()=>{ //at the end of file print the data
+        // console.log(csvData);
+        await saveData(csvData);
+      });
+    res.render('dashboard',{message:'uploaded'})
+});
 
 
 
+async function saveData(csvData){
+   
+    const connection = await getConn();
+
+    // Call the function to insert the CSV data into MySQL
+    await conn.insertCSVData(connection, csvData);
+  
+    // Close the database connection
+    await conn.closeConnection(connection);
+    console.log("Values insertion successfull");
+
+
+}
 
 
 app.listen(process.env.PORT,()=>{
