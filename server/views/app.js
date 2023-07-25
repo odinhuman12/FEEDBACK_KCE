@@ -1,15 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const port = 3000; // Choose a port number for your server
+const port = 3000; 
 
-// Parse URL-encoded bodies (as sent by HTML forms)
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Serve static files (css, images, etc.)
 app.use(express.static(__dirname + '/public'));
 
-// Route for handling form submission
+
 app.post('/auth', (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
@@ -21,7 +20,7 @@ app.post('/auth', (req, res) => {
   res.send(`Username: ${username}, Password: ${password}`);
 });
 
-// Start the server
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
