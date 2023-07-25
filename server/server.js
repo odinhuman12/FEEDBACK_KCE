@@ -32,7 +32,7 @@ app.post("/auth-student",(req,res)=>{
         
         if(res.length == 0) console.log("User doesn't exists");
         else {
-           if(password == res[0].password) res.render("incorrect pass")
+           if(password != res[0].password) res.render("incorrect pass")
            else console.log("Correct password");
         }
         

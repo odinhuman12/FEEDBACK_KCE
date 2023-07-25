@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const port = 3000; 
+const port = 3001; 
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -13,10 +13,9 @@ app.post('/auth', (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
-  // Do whatever you want with the username and password here
-  // For example, you can store them in a database or validate them
+  //cmd 
   
-  // Respond with a simple message for now
+  //username password
   res.send(`Username: ${username}, Password: ${password}`);
 });
 
