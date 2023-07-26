@@ -27,20 +27,24 @@ app.get("/login",(req,res)=>{
 
 app.post("/auth-student",(req,res)=>{
     const {username,password} = req.body;
-    db.query('SELECT * FROM auth WHERE username = ?',[username],(err,res)=>{
+    db.query('SELECT * FROM auth WHERE username = ?',[username],(err,rs)=>{
         if(err) console.log(err);
         
-        if(res.length == 0) console.log("User doesn't exists");
+        if(rs.length == 0) console.log("User doesn't exists");
         else {
-           if(password != res[0].password) res.render("incorrect pass")
-           else console.log("Correct password");
+           if(password == rs[0].password) res.render("questions")
+           else res.render("stlogin")
         }
         
     });
-    res.send("Request received");
+    
 });
+ app.post('/rating', (req, res)=> {
+    const formData = req.body; 
+    console.log(formData);
+  });
 
-console.log("hello");
+
 //admin portal
 app.get("/admin",(req,res)=>{
     res.render('adlogin',{message:''});
