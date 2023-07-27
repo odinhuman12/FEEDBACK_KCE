@@ -7,6 +7,9 @@ const app = express(); //instance of express application
 const fs=require('fs');
 const multer=require('multer');
 const csvParser=require('csv-parser');
+const cookieParser = require("cookie-parser");
+const sessions = require('express-session');
+
 
 
 
@@ -21,25 +24,53 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 
+const oneDay = 1000*60*60*24;
+app.use(sessions({
+    secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
+    saveUninitialized:true,
+    cookie: { maxAge: oneDay },
+    resave: false 
+}))
+app.use(cookieParser());
+var session;
+
+
 app.get("/login",(req,res)=>{
     res.render('stlogin',{message:''});
 });
 
-app.post("/auth-student",(req,res)=>{
+app.post("/auth-student",async(req,res)=>{
     const {username,password} = req.body;
-    db.query('SELECT * FROM auth WHERE username = ?',[username],(err,res)=>{
-        if(err) console.log(err);
-        
-        if(res.length == 0) console.log("User doesn't exists");
-        else {
-           if(password == res[0].password) res.render("incorrect pass")
-           else console.log("Correct password");
+    const db = await getConn();
+    try{
+    db.query('SELECT rollno,password FROM student_data WHERE rollno = ?',[username],(err,rs)=>{
+        if(err) {
+            rs.render('stlogin',{message:'Incorrect UserName or Password'});
         }
+        else{
+        if(rs.length == 0) res.render("stlogin",{message:"Incorrect User-name or Password"})
+        else {
+           if(password == rs[0].password){
+            //creating a new session
+            //  session=req.session;
+            //  session.userid=req.body.username;
+            //  console.log(req.session);
+             res.redirect('/questions');
+           } 
+           else res.render("stlogin",{message:"Incorrect User-name or Password"})
+        }
+      }
         
     });
-    res.send("Request received");
+    }catch(err){
+        console.log(err);
+    }
+  
 });
 
+app.get('/questions',(req,res)=>{
+    res.render('questions');
+})
 console.log("hello");
 //admin portal
 app.get("/admin",(req,res)=>{

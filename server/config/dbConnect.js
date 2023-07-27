@@ -4,7 +4,7 @@ const mysql = require('mysql2');
 const dbConfig = {
   host: 'localhost',
   user: 'root',
-  password: '20f110', 
+  password: 'Mysql26!', 
   database: 'feedback_app',
 };
 
