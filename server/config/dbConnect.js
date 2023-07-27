@@ -20,10 +20,12 @@ async function closeConnection(connection) {
 
 
 async function insertCSVData(connection, csvData) {
+  let count = 0;
   try {
-    let cols = Object.keys(csvData[0]).join(' VARCHAR(30), ');
-    cols = cols.concat(" VARCHAR(30) ");
+    let cols = Object.keys(csvData[0]).join(' VARCHAR(100), ');
+    cols = cols.concat(" VARCHAR(100) ");
     // console.log(cols);
+
     //dropping the old table
     await new Promise((resolve,reject)=>{
       connection.query('DROP TABLE IF EXISTS student_data',(err,rs)=>{
@@ -52,7 +54,7 @@ async function insertCSVData(connection, csvData) {
     // console.log(columns);
     // console.log(placeholders);
     const insertQuery = `INSERT INTO student_data (${columns}) VALUES (${placeholders})`;
-
+    
   for (const row of csvData) {
       const values = Object.values(row);
     // Insert the data into the MySQL table using the prepared INSERT query
@@ -64,13 +66,16 @@ async function insertCSVData(connection, csvData) {
           resolve(results);
         }
       });
+      
     });
+    count++;
   }
 
     console.log('CSV data inserted into MySQL table successfully.');
   } catch (error) {
     console.error('Error inserting CSV data into MySQL:', error);
   }
+  return count;
 }
 
 module.exports = {

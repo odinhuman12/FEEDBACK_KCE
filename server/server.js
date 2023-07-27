@@ -9,6 +9,17 @@ const multer = require('multer');
 const csvParser = require('csv-parser');
 
 
+// creating 24 hours from milliseconds
+const oneDay = 1000 * 60 * 60 * 24;
+
+// //session middleware
+// app.use(sessions({
+//     secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
+//     saveUninitialized:true,
+//     cookie: { maxAge: oneDay },
+//     resave: false
+// }));
+
 async function getConn(){
    const db = await conn.createConnection();
    console.log("Database connected!")
@@ -22,6 +33,9 @@ app.use(express.static(path.join(__dirname, 'public/images')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
+// cookie parser middleware
+// app.use(cookieParser());
+var session;
 
 
 
@@ -32,14 +46,21 @@ app.get("/login",(req,res)=>{
 app.post("/auth-student",async(req,res)=>{
     const {username,password} = req.body;
     const db = await getConn();
-    db.query('SELECT * FROM auth WHERE username = ?',[username],(err,res)=>{
+    db.query('SELECT * FROM auth WHERE username = ?',[username],(err,rs)=>{
         if(err) console.log(err);
-        
-        if(res.length == 0) console.log("User doesn't exists");
+        else{
+        if(rs.length == 0) console.log("User doesn't exists");
         else {
-           if(password == res[0].password) res.render("incorrect pass")
-           else console.log("Correct password");
+           if(password == rs[0].password){
+            //creating a new session
+            //  session=req.session;
+            //  session.userid=req.body.username;
+            //  console.log(req.session);
+             res.render('questions');
+           } 
+           else res.render("stlogin",{message:"Incorrect User-name or Password"})
         }
+      }
         
     });
     res.send("Request received");
@@ -72,6 +93,7 @@ app.post('/save',upload.single('csvfile'),async(req,res)=>{
    
     //parsing the csv
     const csvData = []
+    let count = 0;
     try{
     fs.createReadStream(req.file.path) //creating a stream
       .pipe(csvParser()) //piping that stream
@@ -80,10 +102,13 @@ app.post('/save',upload.single('csvfile'),async(req,res)=>{
       })
       .on('end',async ()=>{ //at the end of file print the data
         // console.log(csvData);
-        await saveData(csvData);
+         count = await saveData(csvData);
+        console.log(count);
+        res.render('dashboard',{message:`Uploaded: Rows ${count}`})
       });
-    res.render('dashboard',{message:'uploaded'})
+    
     }catch(err){
+        console.log("heree");
         res.render('dashboard',{message:'Please select a file'})
     }
 });
@@ -95,10 +120,12 @@ async function saveData(csvData){
     const connection = await getConn();
 
     // Call the function to insert the CSV data into MySQL
-    await conn.insertCSVData(connection, csvData);
+    const count = await conn.insertCSVData(connection, csvData);
   
     // Close the database connection
     await conn.closeConnection(connection);
+
+    return count;
     console.log("Values insertion successfull");
 
 
