@@ -63,10 +63,14 @@ app.post("/auth-student",async(req,res)=>{
       }
         
     });
-    res.send("Request received");
+   
 });
 
 app.post('/rating', (req, res)=> {
+    const formData = req.body; 
+    console.log(formData);
+  });
+  app.post('/rating', (req, res)=> {
     const formData = req.body; 
     console.log(formData);
   });

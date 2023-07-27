@@ -106,6 +106,10 @@
         background-size: cover; /* Adjust the background image size */
         background-position: center center; /* Adjust the background image position */
         margin: 20px;
+        }
+        #question{
+            height: 100px;
+            width:787px;
     }
 
     </style>
@@ -460,9 +464,14 @@
                 </td>
             </tr>
             </table>
+            
+            <div class="form-group">
+                <input type="text" id="question" class="question-box" name="sug" rows="4" placeholder="Questions/ Suggestions">
+            </div>
+
             <input type="submit" value="Submit Feedback" class="submit-button">
             <button class="next-button" onclick="navigateToNextForm()">Next</button>
-        </form>
+        </form> 
     </div>
 
     <script>
