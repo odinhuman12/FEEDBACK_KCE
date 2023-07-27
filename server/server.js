@@ -46,10 +46,13 @@ app.get("/login",(req,res)=>{
 app.post("/auth-student",async(req,res)=>{
     const {username,password} = req.body;
     const db = await getConn();
-    db.query('SELECT * FROM auth WHERE username = ?',[username],(err,rs)=>{
-        if(err) console.log(err);
+    try{
+    db.query('SELECT rollno,password FROM student_data WHERE rollno = ?',[username],(err,rs)=>{
+        if(err) {
+            rs.render('stlogin',{message:'Incorrect UserName or Password'});
+        }
         else{
-        if(rs.length == 0) console.log("User doesn't exists");
+        if(rs.length == 0) res.render("stlogin",{message:"Incorrect User-name or Password"})
         else {
            if(password == rs[0].password){
             //creating a new session
@@ -63,7 +66,10 @@ app.post("/auth-student",async(req,res)=>{
       }
         
     });
-    res.send("Request received");
+    }catch(err){
+        console.log(err);
+    }
+  
 });
 
 //admin portal
@@ -125,8 +131,9 @@ async function saveData(csvData){
     // Close the database connection
     await conn.closeConnection(connection);
 
+        console.log("Values insertion successfull");
     return count;
-    console.log("Values insertion successfull");
+
 
 
 }
