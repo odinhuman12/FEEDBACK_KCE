@@ -28,6 +28,7 @@ async function getConn(){
     return db;
  }
 
+ //session lifetime
 const oneDay = 1000*60*60*24;
 app.use(sessions({
     secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
@@ -44,21 +45,31 @@ app.get("/login",(req,res)=>{
     res.render('stlogin',{message:''});
 });
 
+
+//authenticating user
 app.post("/auth-student",async(req,res)=>{
+
+    //fetching the username and password given by user
     const {username,password} = req.body;
     const db = await getConn();
     try{
+        //fetching actual username and password from DB
     db.query('SELECT rollno,password FROM student_data WHERE rollno = ?',[username],async(err,rs)=>{
         if(err) {
+            //if error render the same login page again
             rs.render('stlogin',{message:'Incorrect UserName or Password'});
         }
         else{
+            //if length is zero which means user doesn't exists
         if(rs.length == 0) res.render("stlogin",{message:"Incorrect User-name or Password"})
         else {
             // console.log(rs);
            if(password == rs[0].password){
+            //If the user is authenticated
             // creating a new session
              session=req.session;
+
+             //creating a new property in the session object and assigning its value as current user name
              session.user_id=req.body.username;
             //  console.log(req.session);
 
@@ -68,7 +79,12 @@ app.post("/auth-student",async(req,res)=>{
             
             //adding the enrolled courses of the user to the user's session
             req.session.enrolledCourses = enrolledCourses;
+
+            //setting up an index in the session to keep track of which course's feedback the user is currently filling
             req.session.index = 0;
+
+
+            //redirecting to the questions page with the index of course and user's rollno
              res.redirect('/questions/'+req.session.user_id+'/0');
            } 
            else res.render("stlogin",{message:"Incorrect User-name or Password"})
@@ -82,17 +98,19 @@ app.post("/auth-student",async(req,res)=>{
   
 });
 
+
+//renders the questions page for the current course (: means dynamic query parameters)
 app.get('/questions/:user_id/:course_index',(req,res)=>{
  try{
     //rendring questions page only if user id exists(i.e, already logged in)
     let user = req.session.user_id;
     const {user_id,course_index} = req.params;
-    const currentCourse = req.session.enrolledCourses[course_index];
+    const currentCourse = req.session.enrolledCourses[course_index]; //fetching the data of current course using the index and array of enrolled courses which is already stored in the session
     // console.log(user);
     
-    if(!currentCourse) res.send("Thank you for the feedback");
+    if(!currentCourse) res.send("Thank you for the feedback"); //if current course is undefined , this means the array of courses came to an end
     else if(user) {
-        res.render('questions',{rollno :user,currentCourse});   
+        res.render('questions',{rollno :user,currentCourse});    //render the questions page with the current course
     }
     else res.redirect('/login'); //if user not logged in redirect to login page
  }catch(err){
@@ -103,10 +121,10 @@ app.get('/questions/:user_id/:course_index',(req,res)=>{
 
 app.post('/rating',(req,res)=>{
   try{
-    console.log(req.body);
-    const nextIndex = Number(req.session.index)+1;
-    req.session.index = nextIndex;
-    res.redirect('/questions/'+req.session.user_id+'/'+req.session.index);
+    console.log(req.body); //fetching the curreent user's feedback for the current course
+    const nextIndex = Number(req.session.index)+1; //incrementing the old index by 1 so that we can redirect the user with the next course
+    req.session.index = nextIndex; //storing the new course index into the session(old will be overriden)
+    res.redirect('/questions/'+req.session.user_id+'/'+req.session.index); //redirecting to the questions page for 'current user' with 'current course'
   }catch(err){
     console.log(err);
   }
@@ -115,7 +133,7 @@ app.post('/rating',(req,res)=>{
 
 
 app.get('/logout',(req,res)=>{
-    req.session.destroy();
+    req.session.destroy(); //deleting the session when the user logs out
     res.redirect('/login');
 });
 
