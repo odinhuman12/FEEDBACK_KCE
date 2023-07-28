@@ -15,13 +15,13 @@ const sessions = require('express-session');
 // creating 24 hours from milliseconds
 const oneDay = 1000 * 60 * 60 * 24;
 
-// //session middleware
-// app.use(sessions({
-//     secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
-//     saveUninitialized:true,
-//     cookie: { maxAge: oneDay },
-//     resave: false
-// }));
+//session middleware
+app.use(sessions({
+    secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
+    saveUninitialized:true,
+    cookie: { maxAge: oneDay },
+    resave: false
+}));
 
 async function getConn(){
    const db = await conn.createConnection();
@@ -46,13 +46,7 @@ async function getConn(){
     return db;
  }
 
-const oneDay = 1000*60*60*24;
-app.use(sessions({
-    secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
-    saveUninitialized:true,
-    cookie: { maxAge: oneDay },
-    resave: false 
-}));
+
 app.use(cookieParser());
 var session;
 
@@ -64,17 +58,34 @@ app.get("/login",(req,res)=>{
 
 app.post("/auth-student",async(req,res)=>{
     const {username,password} = req.body;
-    db.query('SELECT * FROM auth WHERE username = ?',[username],(err,res)=>{
-        if(err) console.log(err);
-        
-        if(res.length == 0) console.log("User doesn't exists");
-        else {
-           if(password == res[0].password) res.render("incorrect pass")
-           else console.log("Correct password");
+    const db = await getConn();
+    try{
+    db.query('SELECT rollno,password FROM student_data WHERE rollno = ?',[username],async(err,rs)=>{
+        if(err) {
+            rs.render('stlogin',{message:'Incorrect UserName or Password'});
         }
+        else{
+        if(rs.length == 0) res.render("stlogin",{message:"Incorrect User-name or Password"})
+        else {
+            // console.log(rs);
+           if(password == rs[0].password){
+            // creating a new session
+             session=req.session;
+             session.userid=req.body.username;
+            //  console.log(req.session);
+            const enrolledCourses = await conn.fetchEnrolledCourses(rs[0].rollno);
+            console.log(db,enrolledCourses);
+             res.redirect('/questions');
+           } 
+           else res.render("stlogin",{message:"Incorrect User-name or Password"})
+        }
+      }
         
     });
-    res.send("Request received");
+    }catch(err){
+        console.log(err);
+    }
+  
 });
 
 console.log("hello");

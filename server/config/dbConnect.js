@@ -4,7 +4,7 @@ const mysql = require('mysql2');
 const dbConfig = {
   host: 'localhost',
   user: 'root',
-  password: 'Mysql26!', 
+  password: '20f110', 
   database: 'feedback_app',
 };
 async function createConnection() {
@@ -12,21 +12,6 @@ async function createConnection() {
   return connection;
 }
 
-<<<<<<< HEAD
-
-async function createConnection() {
-  const connection = mysql.createConnection(dbConfig);
-  return connection;
-}
-
-// Function to close the MySQL database connection
-async function closeConnection(connection) {
-  await connection.end();
-}
-
-
-
-=======
 // Function to close the MySQL database connection
 async function closeConnection(connection) {
   await connection.end();
@@ -34,7 +19,6 @@ async function closeConnection(connection) {
 
 
 //inserting csv into mysql
->>>>>>> e660faa7bee10f404c84930946949eadf9d70650
 async function insertCSVData(connection, csvData) {
   let count = 0;
   try {
@@ -94,8 +78,6 @@ async function insertCSVData(connection, csvData) {
   return count;
 }
 
-<<<<<<< HEAD
-=======
 
 //fetching all the enrolled courses of a particular user
 async function fetchEnrolledCourses(connection,rollno){
@@ -103,7 +85,6 @@ async function fetchEnrolledCourses(connection,rollno){
     connection.query('SELECT ')
   });
 }
->>>>>>> e660faa7bee10f404c84930946949eadf9d70650
 module.exports = {
   createConnection,
   closeConnection,
