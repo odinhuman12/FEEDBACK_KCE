@@ -1,38 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Karpagam College of Engineering</title>
-  
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f8f9fa;
-      text-align: center;
-      padding: 50px;
-    }
-
-    h1 {
-      font-family: 'Times New Roman', serif;
-      font-size: 36px;
-      margin-bottom: 20px;
-    }
-
-    .course {
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suggestion Box</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-image: url('Bgtext.jpg');
+            background-size: cover;
+        }
+        h1 {
+            color: #333;
+        }
+        .textbox {
+            width: 300px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .submit-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
-
 <body>
-  <h1>Karpagam College of Engineering</h1>
-  <div class="course">
-    <p>Course Code: ABC123</p>
-    <p>Course Name: Introduction to Engineering</p>
-  </div>
+    <h1>Give Us Your Suggestion</h1>
+    <form>
+        <input type="text" class="textbox" placeholder="Enter your suggestion here..." required>
+        <br>
+        <input type="submit" class="submit-btn" value="Submit">
+    </form>
 </body>
-
 </html>
