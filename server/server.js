@@ -4,9 +4,12 @@ const bodyParser = require('body-parser');
 const dotenv = require("dotenv").config();
 const path = require('path');
 const app = express(); //instance of express application
-const fs = require('fs');
-const multer = require('multer');
-const csvParser = require('csv-parser');
+const fs=require('fs');
+const multer=require('multer');
+const csvParser=require('csv-parser');
+const cookieParser = require("cookie-parser");
+const sessions = require('express-session');
+
 
 
 // creating 24 hours from milliseconds
@@ -37,44 +40,44 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(cookieParser());
 var session;
 
+async function getConn(){
+    const db = await conn.createConnection();
+    console.log("Database connected!")
+    return db;
+ }
+
+const oneDay = 1000*60*60*24;
+app.use(sessions({
+    secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
+    saveUninitialized:true,
+    cookie: { maxAge: oneDay },
+    resave: false 
+}));
+app.use(cookieParser());
+var session;
 
 
 app.get("/login",(req,res)=>{
+
     res.render('stlogin',{message:''});
 });
 
 app.post("/auth-student",async(req,res)=>{
     const {username,password} = req.body;
-    const db = await getConn();
-    db.query('SELECT * FROM auth WHERE username = ?',[username],(err,rs)=>{
+    db.query('SELECT * FROM auth WHERE username = ?',[username],(err,res)=>{
         if(err) console.log(err);
-        else{
-        if(rs.length == 0) console.log("User doesn't exists");
+        
+        if(res.length == 0) console.log("User doesn't exists");
         else {
-           if(password == rs[0].password){
-            //creating a new session
-            //  session=req.session;
-            //  session.userid=req.body.username;
-            //  console.log(req.session);
-             res.render('questions');
-           } 
-           else res.render("stlogin",{message:"Incorrect User-name or Password"})
+           if(password == res[0].password) res.render("incorrect pass")
+           else console.log("Correct password");
         }
-      }
         
     });
-   
+    res.send("Request received");
 });
 
-app.post('/rating', (req, res)=> {
-    const formData = req.body; 
-    console.log(formData);
-  });
-  app.post('/rating', (req, res)=> {
-    const formData = req.body; 
-    console.log(formData);
-  });
-
+console.log("hello");
 //admin portal
 app.get("/admin",(req,res)=>{
     res.render('adlogin',{message:''});
