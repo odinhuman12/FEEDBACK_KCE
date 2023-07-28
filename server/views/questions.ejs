@@ -115,15 +115,15 @@
     </style>
 </head>
 <body>
-
+    <% if(currentCourse){ %>
     <div class="form-container">
 
         <div class="logo-container">
             <img src="trans.png" alt="Karpagam Logo">
         </div>
-
+   
         <h2>COURSE END SURVEY</h2>
-        <h3>COURSE CODE /COURSE NAME</h3>
+        <h3><%= currentCourse.coursecode %> / <%= currentCourse.coursename %></h3>
         <h3>Feedback Form</h3>
         <!-- Displaying roll number below the "Feedback form" text -->
         <p>Roll Number:&nbsp; <%= rollno %></p>
@@ -133,6 +133,9 @@
         </p>
 
         <form action="/rating" method="post">
+            <input type="hidden" name="rollno" value="<%= rollno %>">
+            <input type="hidden" name="coursecode" value="<%= currentCourse.coursecode %>">
+            <input type="hidden" name="coursename" value="<%= currentCourse.coursename %>">
             <table>
                 <tr>
                     <th>Question</th>
@@ -465,30 +468,9 @@
             </tr>
             </table>
             
-            <div class="form-group">
-                <input type="text" id="question" class="question-box" name="sug" rows="4" placeholder="Questions/ Suggestions">
-            </div>
-
-            <input type="submit" value="Submit Feedback" class="submit-button">
-            <button class="next-button" onclick="navigateToNextForm()">Next</button>
+            <button type="submit" class="next-button">Next</button>
         </form> 
     </div>
-
-    <script>
-        // Function to retrieve roll number from the URL
-        function getRollNumberFromURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('roll') || '';
-        }
-
-        // Display the roll number on the page
-        const rollNumberSpan = document.getElementById('rollNumber');
-        const rollNumber = getRollNumberFromURL();
-        rollNumberSpan.textContent = rollNumber;
-
-        function navigateToNextForm() {
-            //window.location.href = 'next_feedback_form.html';
-        }
-    </script>
+    <% } %>
 </body>
 </html>

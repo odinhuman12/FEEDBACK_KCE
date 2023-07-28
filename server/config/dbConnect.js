@@ -81,12 +81,21 @@ async function insertCSVData(connection, csvData) {
 
 //fetching all the enrolled courses of a particular user
 async function fetchEnrolledCourses(connection,rollno){
+  let enrolledCourses = [];
   await new Promise((resolve,reject)=>{
-    connection.query('SELECT ')
+    connection.query('SELECT coursecode,coursename FROM student_data WHERE rollno=?',[rollno],(err,rs)=>{
+      if(err) reject(err);
+      else{
+        enrolledCourses = rs;
+        resolve();
+      }
+    })
   });
+  return enrolledCourses;
 }
 module.exports = {
   createConnection,
   closeConnection,
   insertCSVData,
+  fetchEnrolledCourses
 };

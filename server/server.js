@@ -59,11 +59,17 @@ app.post("/auth-student",async(req,res)=>{
            if(password == rs[0].password){
             // creating a new session
              session=req.session;
-             session.userid=req.body.username;
+             session.user_id=req.body.username;
             //  console.log(req.session);
-            const enrolledCourses = await conn.fetchEnrolledCourses(rs[0].rollno);
-            console.log(db,enrolledCourses);
-             res.redirect('/questions');
+
+            //fetching courses enrolled by the current_user
+            const enrolledCourses = await conn.fetchEnrolledCourses(db,rs[0].rollno);
+            // console.log(enrolledCourses);
+            
+            //adding the enrolled courses of the user to the user's session
+            req.session.enrolledCourses = enrolledCourses;
+            req.session.index = 0;
+             res.redirect('/questions/'+req.session.user_id+'/0');
            } 
            else res.render("stlogin",{message:"Incorrect User-name or Password"})
         }
@@ -76,14 +82,36 @@ app.post("/auth-student",async(req,res)=>{
   
 });
 
-app.get('/questions',(req,res)=>{
+app.get('/questions/:user_id/:course_index',(req,res)=>{
+ try{
     //rendring questions page only if user id exists(i.e, already logged in)
-    let user = req.session.userid;
-    console.log(user);
-    if(user) res.render('questions',{rollno :user});
-    else res.redirect('/login');
+    let user = req.session.user_id;
+    const {user_id,course_index} = req.params;
+    const currentCourse = req.session.enrolledCourses[course_index];
+    // console.log(user);
+    
+    if(!currentCourse) res.send("Thank you for the feedback");
+    else if(user) {
+        res.render('questions',{rollno :user,currentCourse});   
+    }
+    else res.redirect('/login'); //if user not logged in redirect to login page
+ }catch(err){
+    console.log(err);
+ }
+    
 });
 
+app.post('/rating',(req,res)=>{
+  try{
+    console.log(req.body);
+    const nextIndex = Number(req.session.index)+1;
+    req.session.index = nextIndex;
+    res.redirect('/questions/'+req.session.user_id+'/'+req.session.index);
+  }catch(err){
+    console.log(err);
+  }
+   
+})
 
 
 app.get('/logout',(req,res)=>{
