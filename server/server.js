@@ -1,5 +1,5 @@
 const express = require("express");
-const db= require("./config/dbConnect")
+const conn = require("./config/dbConnect")
 const bodyParser = require('body-parser');
 const dotenv = require("dotenv").config();
 const path = require('path');
@@ -22,7 +22,11 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
+async function getConn(){
+    const db = await conn.createConnection();
+    console.log("Database connected!")
+    return db;
+ }
 
 const oneDay = 1000*60*60*24;
 app.use(sessions({
@@ -30,12 +34,13 @@ app.use(sessions({
     saveUninitialized:true,
     cookie: { maxAge: oneDay },
     resave: false 
-}))
+}));
 app.use(cookieParser());
 var session;
 
 
 app.get("/login",(req,res)=>{
+
     res.render('stlogin',{message:''});
 });
 
@@ -43,18 +48,21 @@ app.post("/auth-student",async(req,res)=>{
     const {username,password} = req.body;
     const db = await getConn();
     try{
-    db.query('SELECT rollno,password FROM student_data WHERE rollno = ?',[username],(err,rs)=>{
+    db.query('SELECT rollno,password FROM student_data WHERE rollno = ?',[username],async(err,rs)=>{
         if(err) {
             rs.render('stlogin',{message:'Incorrect UserName or Password'});
         }
         else{
         if(rs.length == 0) res.render("stlogin",{message:"Incorrect User-name or Password"})
         else {
+            // console.log(rs);
            if(password == rs[0].password){
-            //creating a new session
-            //  session=req.session;
-            //  session.userid=req.body.username;
+            // creating a new session
+             session=req.session;
+             session.userid=req.body.username;
             //  console.log(req.session);
+            const enrolledCourses = await conn.fetchEnrolledCourses(rs[0].rollno);
+            console.log(db,enrolledCourses);
              res.redirect('/questions');
            } 
            else res.render("stlogin",{message:"Incorrect User-name or Password"})
@@ -69,9 +77,21 @@ app.post("/auth-student",async(req,res)=>{
 });
 
 app.get('/questions',(req,res)=>{
-    res.render('questions');
-})
-console.log("hello");
+    //rendring questions page only if user id exists(i.e, already logged in)
+    let user = req.session.userid;
+    console.log(user);
+    if(user) res.render('questions',{rollno :user});
+    else res.redirect('/login');
+});
+
+
+
+app.get('/logout',(req,res)=>{
+    req.session.destroy();
+    res.redirect('/login');
+});
+
+
 //admin portal
 app.get("/admin",(req,res)=>{
     res.render('adlogin',{message:''});
