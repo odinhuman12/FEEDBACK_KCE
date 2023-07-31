@@ -54,7 +54,7 @@ app.post("/auth-student",async(req,res)=>{
     const db = await getConn();
     try{
         //fetching actual username and password from DB
-    db.query('SELECT rollno,password FROM student_data WHERE rollno = ?',[username],async(err,rs)=>{
+    db.query('SELECT rollno,dept,name,password FROM student_data WHERE rollno = ? LIMIT 1',[username],async(err,rs)=>{
         if(err) {
             //if error render the same login page again
             res.render('stlogin',{message:'Incorrect UserName or Password'});
@@ -71,10 +71,12 @@ app.post("/auth-student",async(req,res)=>{
 
              //creating a new property in the session object and assigning its value as current user name
              session.user_id=req.body.username;
-            //  console.log(req.session);
-
+             session.dept = rs[0].dept;
+             session.student_name = rs[0].name;
+             
             //fetching courses enrolled by the current_user
             const enrolledCourses = await conn.fetchEnrolledCourses(db,rs[0].rollno);
+            // console.log(rs);
             // console.log(enrolledCourses);
             
             //adding the enrolled courses of the user to the user's session
@@ -83,7 +85,7 @@ app.post("/auth-student",async(req,res)=>{
             //setting up an index in the session to keep track of which course's feedback the user is currently filling
             req.session.index = 0;
 
-
+           
             //redirecting to the questions page with the index of course and user's rollno
              res.redirect('/questions/'+req.session.user_id+'/0');
            } 
@@ -110,7 +112,19 @@ app.get('/questions/:user_id/:course_index',(req,res)=>{
     
     if(!currentCourse) res.send("Thank you for the feedback"); //if current course is undefined , this means the array of courses came to an end
     else if(user) {
-        res.render('questions',{rollno :user,currentCourse});    //render the questions page with the current course
+        //splitting the rollno with the alphabet as breakpoint to find out the section of the user.
+        const splitted = user.split(/[a-zA-Z]/);
+        const checker = splitted[1][0]; //first digit of the rollno.
+
+        const section = (checker == '1' || checker == '5') ? 'A' : (checker == '2' || checker == '6') ? 'B' : 'C';
+        const current_user = {
+            rollno : user,
+            dept : req.session.dept,
+            student_name : req.session.student_name,
+            section: section
+        };
+        
+        res.render('questions',{user : current_user,currentCourse});    //render the questions page with the current course
     }
     else res.redirect('/login'); //if user not logged in redirect to login page
  }catch(err){
@@ -121,9 +135,10 @@ app.get('/questions/:user_id/:course_index',(req,res)=>{
 });
 
 //User's feedback for a course
-app.post('/rating',(req,res)=>{
+app.post('/rating',async(req,res)=>{
   try{
-    console.log(req.body); //fetching the curreent user's feedback for the current course
+    const db = await getConn();
+    await conn.saveFeedback(db,req.body);
     const nextIndex = Number(req.session.index)+1; //incrementing the old index by 1 so that we can redirect the user with the next course
     req.session.index = nextIndex; //storing the new course index into the session(old value of index will be overwrited)
     res.redirect('/questions/'+req.session.user_id+'/'+req.session.index); //redirecting to the questions page for 'current user' with 'next course'

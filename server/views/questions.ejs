@@ -128,16 +128,20 @@
         <h3><%= currentCourse.coursecode %> / <%= currentCourse.coursename %></h3>
         <h3>Feedback Form</h3>
         <!-- Displaying roll number below the "Feedback form" text -->
-        <p>Roll Number:&nbsp; <%= rollno %></p>
+        <p>Roll Number:&nbsp; <%= user.rollno %></p>
 
         <p class="q-instructions">
-            1-Bad &nbsp; 2-Satisfactory &nbsp; 3-Good &nbsp; 4-Very Good &nbsp; 5-Excellent
+            5-Excellent &nbsp; 4-Very Good  &nbsp;3-Good &nbsp; 2-Satisfactory &nbsp; 1-Bad 
         </p>
 
         <form action="/rating" method="post">
-            <input type="hidden" name="rollno" value="<%= rollno %>">
-            <input type="hidden" name="coursecode" value="<%= currentCourse.coursecode %>">
-            <input type="hidden" name="coursename" value="<%= currentCourse.coursename %>">
+            <input type="hidden" name="dept" value="<%= user.dept %>">
+            <input type="hidden" name="rollno" value="<%= user.rollno %>">
+            <input type="hidden" name="sem_no" value="<%= currentCourse.sem %>" >
+            <input type="hidden" name="stu_name" value="<%= user.student_name %>">
+            <input type="hidden" name="sub_code" value="<%= currentCourse.coursecode %>">
+            <input type="hidden" name="sub_name" value="<%= currentCourse.coursename %>">
+            <input type="hidden" name="staff_name" value="<%= currentCourse.facultyName %>">
             <table>
                 <tr>
                     <th>Question</th>
@@ -470,7 +474,7 @@
                 </td>
             </tr>
             </table>
-            
+            <input type="hidden" name="section" value="<%= user.section %>" >
             <button type="submit" class="next-button">Next</button>
         </form> 
     </div>

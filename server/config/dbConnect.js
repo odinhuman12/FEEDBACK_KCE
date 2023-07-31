@@ -50,7 +50,7 @@ async function insertCSVData(connection, csvData) {
     // Prepare the INSERT query with placeholders
     const columns = Object.keys(csvData[0]).join(', ');
     const valuesPlaceholders = csvData[0] ? csvData[0] : {};
-    const placeholders = Object.keys(valuesPlaceholders).map(() => '?').join(', ');
+    const placeholders = Object.keys(valuesPlaceholders).map(() => '?').join(', '); //map()=>'?' will replace the string into '?'
     // console.log(columns);
     // console.log(placeholders);
     const insertQuery = `INSERT INTO student_data (${columns}) VALUES (${placeholders})`;
@@ -83,7 +83,7 @@ async function insertCSVData(connection, csvData) {
 async function fetchEnrolledCourses(connection,rollno){
   let enrolledCourses = [];
   await new Promise((resolve,reject)=>{
-    connection.query('SELECT coursecode,coursename FROM student_data WHERE rollno=?',[rollno],(err,rs)=>{
+    connection.query('SELECT coursecode,coursename,sem,facultyName FROM student_data WHERE rollno=?',[rollno],(err,rs)=>{
       if(err) reject(err);
       else{
         enrolledCourses = rs;
@@ -92,10 +92,47 @@ async function fetchEnrolledCourses(connection,rollno){
     })
   });
   return enrolledCourses;
+};
+
+
+async function saveFeedback(connection,user_data){
+  try{
+    //splitting the json into colums and its values
+    let cols = Object.keys(user_data).join(', ');
+  // console.log(cols);
+
+   let placeholders = Object.keys(user_data).map(()=> '?').join(', ');
+  //  console.log(placeholders);
+   let values = Object.values(user_data);
+   
+   const query = `INSERT INTO kce_course_feedback (${cols}) VALUES (${placeholders})`;
+  //  console.log(query);
+
+  //inserting data into db
+  await new Promise((resolve,reject) =>{
+    connection.query(query,values,(err,rs)=>{
+      if(err) reject(err);
+      else{
+        resolve(rs);
+      }
+    })
+  });
+  console.log("Feedback data inserted!");
+  } catch(err){
+    console.log(err);
+    console.log("Error occured");
+  }
+  
+  
 }
+
+
+
+
 module.exports = {
   createConnection,
   closeConnection,
   insertCSVData,
-  fetchEnrolledCourses
+  fetchEnrolledCourses,
+  saveFeedback
 };
