@@ -57,7 +57,7 @@ app.post("/auth-student",async(req,res)=>{
     db.query('SELECT rollno,password FROM student_data WHERE rollno = ?',[username],async(err,rs)=>{
         if(err) {
             //if error render the same login page again
-            rs.render('stlogin',{message:'Incorrect UserName or Password'});
+            res.render('stlogin',{message:'Incorrect UserName or Password'});
         }
         else{
             //if length is zero which means user doesn't exists
@@ -115,16 +115,18 @@ app.get('/questions/:user_id/:course_index',(req,res)=>{
     else res.redirect('/login'); //if user not logged in redirect to login page
  }catch(err){
     console.log(err);
+    res.redirect('/login');
  }
     
 });
 
+//User's feedback for a course
 app.post('/rating',(req,res)=>{
   try{
     console.log(req.body); //fetching the curreent user's feedback for the current course
     const nextIndex = Number(req.session.index)+1; //incrementing the old index by 1 so that we can redirect the user with the next course
-    req.session.index = nextIndex; //storing the new course index into the session(old will be overriden)
-    res.redirect('/questions/'+req.session.user_id+'/'+req.session.index); //redirecting to the questions page for 'current user' with 'current course'
+    req.session.index = nextIndex; //storing the new course index into the session(old value of index will be overwrited)
+    res.redirect('/questions/'+req.session.user_id+'/'+req.session.index); //redirecting to the questions page for 'current user' with 'next course'
   }catch(err){
     console.log(err);
   }
@@ -138,15 +140,17 @@ app.get('/logout',(req,res)=>{
 });
 
 
-//admin portal
+//  -- ADMIN PORTAL --
+
+//admin login
 app.get("/admin",(req,res)=>{
     res.render('adlogin',{message:''});
 });
 
 //authenticate admin
-app.post("/auth-admin",(req,res)=>{
+app.post("/auth-admin",async(req,res)=>{
     const {username,password} = req.body;
-
+    const db = await getConn();
     db.query('SELECT * FROM auth WHERE username = ?',[username],(err,rs)=>{
         if(err) console.log(err);
         
@@ -162,8 +166,44 @@ app.post("/auth-admin",(req,res)=>{
 
 //read excel
 app.post('/save',upload.single('csvfile'),(req,res)=>{
-    console.log('done');
-})
+    //parsing the csv
+    const csvData = []
+    let count = 0;
+    try{
+    fs.createReadStream(req.file.path) //creating a stream
+      .pipe(csvParser()) //piping that stream
+      .on('data',(data)=>{ //reading data one by one
+        csvData.push(data);
+      })
+      .on('end',async ()=>{ //at the end of file print the data
+        console.log(csvData);
+         count = await saveData(csvData); //saving the csv data into db
+        console.log(count);
+        res.render('dashboard',{message:`Uploaded: Rows ${count}`})
+      });
+    
+    }catch(err){
+        console.log(err);
+        // res.render('dashboard',{message:'Please select a file'})
+    }
+});
+
+
+
+async function saveData(csvData){
+   
+    const connection = await getConn();
+
+    // Call the function to insert the CSV data into MySQL
+    const count = await conn.insertCSVData(connection, csvData);
+  
+    // Close the database connection
+    await conn.closeConnection(connection);
+
+    return count;
+    
+}
+
 
 
 
