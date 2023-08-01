@@ -241,7 +241,9 @@ async function getReport(conn,constraints){
    COUNT(CASE WHEN q18 = 2 THEN 1 END) AS count_q18_2,
    COUNT(CASE WHEN q18 = 3 THEN 1 END) AS count_q18_3,
    COUNT(CASE WHEN q18 = 4 THEN 1 END) AS count_q18_4,
-   COUNT(CASE WHEN q18 = 5 THEN 1 END) AS count_q18_5
+   COUNT(CASE WHEN q18 = 5 THEN 1 END) AS count_q18_5,
+
+   COUNT(DISTINCT rollno) AS total_stu
  
  FROM
    kce_course_feedback

@@ -1,0 +1,239 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+        <div>
+            <h1>Course End Survey FeedBack Report</h1>
+    
+            <strong>Department:</strong> <%= query.dept %>&nbsp; <strong>Semester:</strong> <%= query.sem %>&nbsp; <strong>Batch:</strong> <%= query.batch %>
+
+            <% report.forEach((course)=> {  %>
+            <br>
+            <br>
+            <strong>Course:&nbsp;</strong> <span><%= course.sub_code %> - <%= course.sub_name %></span>
+            <br>
+            <table border="2" cellspacing="2">
+                <tr>
+                    <th style="padding-left:10px;padding-right: 20px;">Questions</th>
+                    <th>Q1</th>
+                    <th>Q2</th>
+                    <th>Q3</th>
+                    <th>Q4</th>
+                    <th>Q5</th>
+                    <th>Q6</th>
+                    <th>Q7</th>
+                    <th>Q8</th>
+                    <th>Q9</th>
+                    <th>Q10</th>
+                    <th>Q11</th>
+                    <th>Q12</th>
+                    <th>Q13</th>
+                    <th>Q14</th>
+                    <th>Q15</th>
+                    <th>Q16</th>
+                    <th>Q17</th>
+                    <th>Q18</th>
+                </tr>
+
+                <tr>
+                    <td>No of 5's</td>
+                    <td> <%= course.count_q1_5 %> </td>
+                    <td> <%= course.count_q2_5 %> </td>
+                    <td> <%= course.count_q3_5 %> </td>
+                    <td> <%= course.count_q4_5 %> </td>
+                    <td> <%= course.count_q5_5 %> </td>
+                    <td> <%= course.count_q6_5 %> </td>
+                    <td> <%= course.count_q7_5 %> </td>
+                    <td> <%= course.count_q8_5 %> </td>
+                    <td> <%= course.count_q9_5 %> </td>
+                    <td> <%= course.count_q10_5 %> </td>
+                    <td> <%= course.count_q11_5 %> </td>
+                    <td> <%= course.count_q12_5 %> </td>
+                    <td> <%= course.count_q13_5 %> </td>
+                    <td> <%= course.count_q14_5 %> </td>
+                    <td> <%= course.count_q15_5 %> </td>
+                    <td> <%= course.count_q16_5 %> </td>
+                    <td> <%= course.count_q17_5 %> </td>
+                    <td> <%= course.count_q18_5 %> </td>
+                </tr>
+
+                <tr>
+                    <td>No of 4's</td>
+                    <td> <%= course.count_q1_4 %> </td>
+                    <td> <%= course.count_q2_4 %> </td>
+                    <td> <%= course.count_q3_4 %> </td>
+                    <td> <%= course.count_q4_4 %> </td>
+                    <td> <%= course.count_q5_4 %> </td>
+                    <td> <%= course.count_q6_4 %> </td>
+                    <td> <%= course.count_q7_4 %> </td>
+                    <td> <%= course.count_q8_4 %> </td>
+                    <td> <%= course.count_q9_4 %> </td>
+                    <td> <%= course.count_q10_4 %> </td>
+                    <td> <%= course.count_q11_4 %> </td>
+                    <td> <%= course.count_q12_4 %> </td>
+                    <td> <%= course.count_q13_4 %> </td>
+                    <td> <%= course.count_q14_4 %> </td>
+                    <td> <%= course.count_q15_4 %> </td>
+                    <td> <%= course.count_q16_4 %> </td>
+                    <td> <%= course.count_q17_4 %> </td>
+                    <td> <%= course.count_q18_4 %> </td>
+                </tr>
+
+                <tr>
+                    <td>No of 3's</td>
+                    <td> <%= course.count_q1_3 %> </td>
+                    <td> <%= course.count_q2_3 %> </td>
+                    <td> <%= course.count_q3_3 %> </td>
+                    <td> <%= course.count_q4_3 %> </td>
+                    <td> <%= course.count_q5_3 %> </td>
+                    <td> <%= course.count_q6_3 %> </td>
+                    <td> <%= course.count_q7_3 %> </td>
+                    <td> <%= course.count_q8_3 %> </td>
+                    <td> <%= course.count_q9_3 %> </td>
+                    <td> <%= course.count_q10_3 %> </td>
+                    <td> <%= course.count_q11_3 %> </td>
+                    <td> <%= course.count_q12_3 %> </td>
+                    <td> <%= course.count_q13_3 %> </td>
+                    <td> <%= course.count_q14_3 %> </td>
+                    <td> <%= course.count_q15_3 %> </td>
+                    <td> <%= course.count_q16_3 %> </td>
+                    <td> <%= course.count_q17_3 %> </td>
+                    <td> <%= course.count_q18_3 %> </td>
+                </tr>
+
+                <tr>
+                    <td>No of 2's</td>
+                    <td> <%= course.count_q1_2 %> </td>
+                    <td> <%= course.count_q2_2 %> </td>
+                    <td> <%= course.count_q3_2 %> </td>
+                    <td> <%= course.count_q4_2 %> </td>
+                    <td> <%= course.count_q5_2 %> </td>
+                    <td> <%= course.count_q6_2 %> </td>
+                    <td> <%= course.count_q7_2 %> </td>
+                    <td> <%= course.count_q8_2 %> </td>
+                    <td> <%= course.count_q9_2 %> </td>
+                    <td> <%= course.count_q10_2 %> </td>
+                    <td> <%= course.count_q11_2 %> </td>
+                    <td> <%= course.count_q12_2 %> </td>
+                    <td> <%= course.count_q13_2 %> </td>
+                    <td> <%= course.count_q14_2 %> </td>
+                    <td> <%= course.count_q15_2 %> </td>
+                    <td> <%= course.count_q16_2 %> </td>
+                    <td> <%= course.count_q17_2 %> </td>
+                    <td> <%= course.count_q18_2 %> </td>
+
+                </tr>
+
+                <tr>
+                    <td>No of 1's</td>
+                    <td> <%= course.count_q1_1 %> </td>
+                    <td> <%= course.count_q2_1 %> </td>
+                    <td> <%= course.count_q3_1 %> </td>
+                    <td> <%= course.count_q4_1 %> </td>
+                    <td> <%= course.count_q5_1 %> </td>
+                    <td> <%= course.count_q6_1 %> </td>
+                    <td> <%= course.count_q7_1 %> </td>
+                    <td> <%= course.count_q8_1 %> </td>
+                    <td> <%= course.count_q9_1 %> </td>
+                    <td> <%= course.count_q10_1 %> </td>
+                    <td> <%= course.count_q11_1 %> </td>
+                    <td> <%= course.count_q12_1 %> </td>
+                    <td> <%= course.count_q13_1 %> </td>
+                    <td> <%= course.count_q14_1 %> </td>
+                    <td> <%= course.count_q15_1 %> </td>
+                    <td> <%= course.count_q16_1 %> </td>
+                    <td> <%= course.count_q17_1 %> </td>
+                    <td> <%= course.count_q18_1 %> </td>
+                </tr>
+
+                <tr>
+                    <td>Student count</td>
+                    <td colspan="18" style="text-align: center;"> <%= course.total_stu %></td>
+                </tr>
+
+                <tr>
+                    <td>No. of students given 3 & Above</td>
+                    <td>
+                        <% const sum1 = Number(course.count_q1_5) + Number(course.count_q1_4) + Number(course.count_q1_3);%>
+                        <%= sum1 %>
+                    </td>
+                    <td>
+                        <% const sum2 = Number(course.count_q2_5) + Number(course.count_q2_4) + Number(course.count_q2_3);%>
+                        <%= sum2 %>
+                    </td>
+                    <td>
+                        <% const sum3 = Number(course.count_q3_5) + Number(course.count_q3_4) + Number(course.count_q3_3);%>
+                        <%= sum3 %>
+                    </td>
+                    <td>
+                        <% const sum4 = Number(course.count_q4_5) + Number(course.count_q4_4) + Number(course.count_q4_3);%>
+                        <%= sum4 %>
+                    </td>
+                    <td>
+                        <% const sum5 = Number(course.count_q5_5) + Number(course.count_q5_4) + Number(course.count_q5_3);%>
+                        <%= sum5 %>
+                    </td>
+                    <td>
+                        <% const sum6 = Number(course.count_q6_5) + Number(course.count_q6_4) + Number(course.count_q6_3);%>
+                        <%= sum6 %>
+                    </td>
+                    <td>
+                        <% const sum7 = Number(course.count_q7_5) + Number(course.count_q7_4) + Number(course.count_q7_3);%>
+                        <%= sum7 %>
+                    </td>
+                    <td>
+                        <% const sum8 = Number(course.count_q8_5) + Number(course.count_q8_4) + Number(course.count_q8_3);%>
+                        <%= sum8 %>
+                    </td>
+                    <td>
+                        <% const sum9 = Number(course.count_q9_5) + Number(course.count_q9_4) + Number(course.count_q9_3);%>
+                        <%= sum9 %>
+                    </td>
+                    <td>
+                        <% const sum10 = Number(course.count_q10_5) + Number(course.count_q10_4) + Number(course.count_q10_3);%>
+                        <%= sum10 %>
+                    </td>
+                    <td>
+                        <% const sum11 = Number(course.count_q11_5) + Number(course.count_q11_4) + Number(course.count_q11_3);%>
+                        <%= sum11 %>
+                    </td>
+                    <td>
+                        <% const sum12 = Number(course.count_q12_5) + Number(course.count_q12_4) + Number(course.count_q12_3);%>
+                        <%= sum12 %>
+                    </td>
+                    <td>
+                        <% const sum13 = Number(course.count_q13_5) + Number(course.count_q13_4) + Number(course.count_q13_3);%>
+                        <%= sum13 %>
+                    </td>
+                    <td>
+                        <% const sum14 = Number(course.count_q14_5) + Number(course.count_q14_4) + Number(course.count_q14_3);%>
+                        <%= sum14 %>
+                    </td>
+                    <td>
+                        <% const sum15 = Number(course.count_q15_5) + Number(course.count_q15_4) + Number(course.count_q15_3);%>
+                        <%= sum15 %>
+                    </td>
+                    <td>
+                        <% const sum16 = Number(course.count_q16_5) + Number(course.count_q16_4) + Number(course.count_q16_3);%>
+                        <%= sum16 %>
+                    </td>
+                    <td>
+                        <% const sum17 = Number(course.count_q17_5) + Number(course.count_q17_4) + Number(course.count_q17_3);%>
+                        <%= sum17 %>
+                    </td>
+                    <td>
+                        <% const sum18 = Number(course.count_q18_5) + Number(course.count_q18_4) + Number(course.count_q18_3);%>
+                        <%= sum18 %>
+                    </td>
+ 
+                </tr>
+            </table>
+            <br>
+
+            <% }) %>
+        </div>
+       
+
+    </body>
+</html>

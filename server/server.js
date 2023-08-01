@@ -229,11 +229,20 @@ app.get('/report',(req,res)=>{
 });
 
 app.post('/create-report',async(req,res)=>{
-    console.log(req.body);
+   
     const connection = await getConn();
     
     const report = await conn.getReport(connection,req.body);
     console.log(report);
+
+    const query = {
+        dept:req.body.dept,
+        sem:req.body.sem,
+        batch: req.body.batch
+    };
+
+   
+    res.render('final-report',{query,report});
 })
 
 
