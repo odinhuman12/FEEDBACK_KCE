@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Admin Dashboard</title>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<style>
+  /* Apply space between td elements */
+  table {
+    border-collapse: separate;
+    border-spacing: 10px; /* Adjust the value as per your preference */
+  }
+
+  /* Increase drop-down size */
+ 
+  
+</style>
+
+<body class="bg-gradient-to-br from-purple-600 via-pink-500 to-red-500">
+  <nav class="bg-white shadow-md">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between py-4">
+        <div class="font-semibold text-xl">Admin Dashboard</div>
+        <ul class="flex space-x-4">
+          <li>
+            <a href="#" class="text-gray-700 hover:text-purple-600 font-medium">Home</a>
+          </li>
+          <li>
+            <a href="#" class="text-gray-700 hover:text-purple-600 font-medium">Report</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <form action="/create-report" method="post">
+  <div class="flex items-center justify-center h-screen">
+    <div class="w-full max-w-sm">
+      <div class="flex justify-between space-x-4">
+            <div>
+                <label for="dept">Department:</label>
+                  <select name="dept" id="dept"  style=" font-size:15px;">
+                  <option value="IT">IT</option>
+                  <option value="AIDS">AIDS</option>
+                  <option value="CSE">CSE</option>
+                  <option value="CST">CST</option>
+                  <option value="CSD">CSD</option>
+                  <option value="CSE(CS)">CSE(CS)</option>
+                  <option value="ECE">ECE</option>
+                  <option value="ETE">ETE</option>
+                  <option value="EEE">EEE</option>
+                  <option value="CIVIL">CIVIL</option>
+                  <option value="MECH">MECH</option>
+                </select>
+              </div>
+              <div>
+                <label for="sem">Semester:</label>
+                <select name="sem" id="sem" style=" font-size:17px;">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                </select>
+              </div>
+              <div>
+                <label for="batch">Batch:</label>
+                <select name="batch" id="batch" style=" font-size:17px;">
+                  <option value="20">20</option>
+                  <option value="21">21</option>
+                  <option value="22">22</option>
+                  <option value="23">23</option>
+                </select>
+              </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+       
+      </div>
+    </div>
+  </div>
+</form>
+  
+  
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</body>
+
+</html>

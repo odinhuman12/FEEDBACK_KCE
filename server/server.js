@@ -10,9 +10,6 @@ const csvParser=require('csv-parser');
 const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
 
-
-
-
 const upload=multer({dest:'uploads'});
 
 
@@ -70,9 +67,17 @@ app.post("/auth-student",async(req,res)=>{
              session=req.session;
 
              //creating a new property in the session object and assigning its value as current user name
-             session.user_id=req.body.username;
+             session.user_id = req.body.username;
              session.dept = rs[0].dept;
              session.student_name = rs[0].name;
+             
+             //finding batch
+             const splitted = req.body.username.split(/[A-Za-z]/);
+
+             let batch = splitted[0].length == 2 ? splitted[0] : splitted[0].substr(-2);
+              
+             session.batch = batch;
+
              
             //fetching courses enrolled by the current_user
             const enrolledCourses = await conn.fetchEnrolledCourses(db,rs[0].rollno);
@@ -102,15 +107,22 @@ app.post("/auth-student",async(req,res)=>{
 
 
 //renders the questions page for the current course (: means dynamic query parameters)
-app.get('/questions/:user_id/:course_index',(req,res)=>{
+app.get('/questions/:user_id/:course_index',async(req,res)=>{
  try{
     //rendring questions page only if user id exists(i.e, already logged in)
     let user = req.session.user_id;
     const {user_id,course_index} = req.params;
-    const currentCourse = req.session.enrolledCourses[course_index]; //fetching the data of current course using the index and array of enrolled courses which is already stored in the session
+    const currentCourse = await req.session.enrolledCourses[course_index]; //fetching the data of current course using the index and array of enrolled courses which is already stored in the session
     // console.log(user);
     
-    if(!currentCourse) res.send("Thank you for the feedback"); //if current course is undefined , this means the array of courses came to an end
+    if(!currentCourse){
+        const user_data = {
+            rollno: user_id,
+            dept: req.session.dept,
+            sem: req.session.enrolledCourses[0].sem
+        }
+        res.render('feedback',{user_data}); //if current course is undefined , this means the array of courses came to an end
+    }
     else if(user) {
         //splitting the rollno with the alphabet as breakpoint to find out the section of the user.
         const splitted = user.split(/[a-zA-Z]/);
@@ -121,7 +133,8 @@ app.get('/questions/:user_id/:course_index',(req,res)=>{
             rollno : user,
             dept : req.session.dept,
             student_name : req.session.student_name,
-            section: section
+            section: section,
+            batch: req.session.batch
         };
         
         res.render('questions',{user : current_user,currentCourse});    //render the questions page with the current course
@@ -145,7 +158,11 @@ app.post('/rating',async(req,res)=>{
   }catch(err){
     console.log(err);
   }
-   
+});
+
+app.post('/suggestions',(req,res)=>{
+    console.log(req.body);
+    res.send('Thank you for the feedback')
 })
 
 
@@ -171,7 +188,10 @@ app.post("/auth-admin",async(req,res)=>{
         
         if(rs.length == 0) res.render('adlogin',{message:'Incorrect UserName or password'});
         else {
-           if(password == rs[0].password) res.render('dashboard',{message:' '});
+           if(password == rs[0].password){
+             
+             res.render('dashboard',{message:' '});
+           }
            else res.render('adlogin',{message:'Incorrect UserName or password'});
         }
         
@@ -203,6 +223,18 @@ app.post('/save',upload.single('csvfile'),(req,res)=>{
     }
 });
 
+//report
+app.get('/report',(req,res)=>{
+    res.render('report-query');
+});
+
+app.post('/create-report',async(req,res)=>{
+    console.log(req.body);
+    const connection = await getConn();
+    
+    const report = await conn.getReport(connection,req.body);
+    console.log(report);
+})
 
 
 async function saveData(csvData){
@@ -218,11 +250,6 @@ async function saveData(csvData){
     return count;
     
 }
-
-
-
-
-
 
 app.listen(process.env.PORT,()=>{
     console.log(`Server running on port ${process.env.PORT}`);

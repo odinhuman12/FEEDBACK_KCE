@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suggestion Box</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-image: url('Bgtext.jpg');
+            background-size: cover;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            background-color: #f9f9f9;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+            border-radius: 10px; 
+            text-align: left; 
+            padding-left: 15px; 
+            margin-right: 50px;
+            
+        }
+        .textbox {
+            width: 500px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .submit-btn {
+            padding: 15px 20px;
+            margin-top: 10px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Give Us Your Suggestion</h1>
+        <form action="/suggestions" method="post">
+            <input type="hidden" name="rollno" value="<%= user_data.rollno %>">
+            <input type="hidden" name="dept" value="<%= user_data.dept %>" >
+            <input type="hidden" name="sem" value="<%= user_data.sem %>">
+            <input type="text" name="suggestion" class="textbox" placeholder="Enter your suggestion here..." required>
+            <br>
+            <input type="submit" class="submit-btn" value="Submit">
+        </form>
+    </div>
+</body>
+</html>
