@@ -35,7 +35,7 @@ app.use(sessions({
 }));
 app.use(cookieParser());
 var session;
-
+var disableResponses = false;
 
 app.get("/login",(req,res)=>{
 
@@ -49,6 +49,7 @@ app.post("/auth-student",async(req,res)=>{
     //fetching the username and password given by user
     const {username,password} = req.body;
     const db = await getConn();
+   
     try{
         //fetching actual username and password from DB
     db.query('SELECT rollno,dept,name,password FROM student_data WHERE rollno = ? LIMIT 1',[username],async(err,rs)=>{
@@ -59,6 +60,7 @@ app.post("/auth-student",async(req,res)=>{
         else{
             //if length is zero which means user doesn't exists
         if(rs.length == 0) res.render("stlogin",{message:"Incorrect User-name or Password"})
+        else if(disableResponses) res.render('stlogin',{message: 'Currently not accepting responses'});
         else {
             // console.log(rs);
            if(password == rs[0].password){
@@ -119,7 +121,8 @@ app.get('/questions/:user_id/:course_index',async(req,res)=>{
         const user_data = {
             rollno: user_id,
             dept: req.session.dept,
-            sem: req.session.enrolledCourses[0].sem
+            sem: req.session.enrolledCourses[0].sem,
+            batch: req.session.batch
         }
         res.render('feedback',{user_data}); //if current course is undefined , this means the array of courses came to an end
     }
@@ -160,14 +163,23 @@ app.post('/rating',async(req,res)=>{
   }
 });
 
-app.post('/suggestions',(req,res)=>{
-    console.log(req.body);
+app.post('/suggestions',async(req,res)=>{
+    const db = await getConn();
+    await conn.saveSuggestions(db,req.body);
     res.send('Thank you for the feedback')
 })
 
 
 app.get('/logout',(req,res)=>{
-    req.session.destroy(); //deleting the session when the user logs out
+
+
+    delete req.session.user_id
+    delete req.session.dept
+    delete req.session.student_name
+    delete req.session.batch
+    delete req.session.enrolledCourses
+    delete req.session.index
+
     res.redirect('/login');
 });
 
@@ -189,14 +201,21 @@ app.post("/auth-admin",async(req,res)=>{
         if(rs.length == 0) res.render('adlogin',{message:'Incorrect UserName or password'});
         else {
            if(password == rs[0].password){
-             
-             res.render('dashboard',{message:' '});
+             session = req.session;
+             session.admin_id = rs[0].username;
+             res.redirect('dashboard');
            }
            else res.render('adlogin',{message:'Incorrect UserName or password'});
         }
         
     });
 });
+
+app.get("/dashboard",(req,res)=>{
+    admin_id = req.session.admin_id;
+    if(admin_id)   res.render('dashboard',{message:' '});
+    else res.redirect('/admin');
+})
 
 
 //read excel
@@ -225,7 +244,9 @@ app.post('/save',upload.single('csvfile'),(req,res)=>{
 
 //report
 app.get('/report',(req,res)=>{
-    res.render('report-query');
+    admin_id = req.session.admin_id;
+    if(admin_id)  res.render('report-query');
+    else res.redirect('/admin');
 });
 
 app.post('/create-report',async(req,res)=>{
@@ -258,9 +279,17 @@ async function saveData(csvData){
 
     return count;
     
-}
+};
 
-app.listen(process.env.PORT,()=>{
+app.get('/admin-logout',(req,res)=>{
+    if(req.session.admin_id) {
+        delete req.session.admin_id;
+       res.redirect('/admin');
+    }
+    else res.redirect('/admin')
+})
+
+app.listen(process.env.PORT,'192.168.43.168',()=>{
     console.log(`Server running on port ${process.env.PORT}`);
 });
 

@@ -3,7 +3,7 @@
 
     </head>
     <body>
-        <div>
+        <div style="align-items: center;">
             <h1>Course End Survey FeedBack Report</h1>
     
             <strong>Department:</strong> <%= query.dept %>&nbsp; <strong>Semester:</strong> <%= query.sem %>&nbsp; <strong>Batch:</strong> <%= query.batch %>
@@ -232,8 +232,16 @@
             <br>
 
             <% }) %>
+            <button id="print-btn">Print</button>
         </div>
        
 
     </body>
+    <script>
+        const printButton = document.getElementById('print-btn');
+
+       printButton.addEventListener('click', () => {
+            window.print();
+      });
+    </script>
 </html>

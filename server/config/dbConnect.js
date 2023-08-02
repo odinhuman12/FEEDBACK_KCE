@@ -268,6 +268,40 @@ async function getReport(conn,constraints){
 }
 
 
+async function saveSuggestions(connection,data){
+  console.log(data);
+  try{
+    let cols = Object.keys(data).join(' VARCHAR(100), ');
+    cols = cols.concat(" VARCHAR(100) ");
+  await new Promise((resolve,reject)=>{
+    connection.query(`CREATE TABLE IF NOT EXISTS students_suggestions (${cols})`,(err,rs)=>{
+      if(err) reject(err);
+      else resolve(rs);
+    })
+  });
+  
+  const columns = Object.keys(data).join(', ');
+  const placeholders = Object.keys(valuesPlaceholders).map(() => '?').join(', '); //map()=>'?' will replace the string into '?'
+  // console.log(columns);
+  // console.log(placeholders);
+  const insertQuery = `INSERT INTO students_suggestions (${columns}) VALUES (${placeholders})`;
+  
+  const values = Object.values(data);
+  await new Promise((resolve,reject)=>{
+    connection.query(insertQuery,values,(err,rs)=>{
+      if(err) reject(err);
+      else resolve(rs);
+    })
+  });
+  console.log("Suggestions inserted into db");
+
+  } catch(err){
+    console.log(err);
+  }
+  
+}
+
+
 
 
 module.exports = {
@@ -276,5 +310,6 @@ module.exports = {
   insertCSVData,
   fetchEnrolledCourses,
   saveFeedback,
-  getReport
+  getReport,
+  saveSuggestions
 };
