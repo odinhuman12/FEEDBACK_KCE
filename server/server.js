@@ -4,14 +4,14 @@ const bodyParser = require('body-parser');
 const dotenv = require("dotenv").config();
 const path = require('path');
 const app = express(); //instance of express application
-const fs=require('fs');
+const fs = require('fs');
 const multer=require('multer');
 const csvParser=require('csv-parser');
 const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
+const json2csv = require('json2csv').Parser;
 
 const upload=multer({dest:'uploads'});
-
 
 //telling express to serve static files from public folder
 app.use(express.static(path.join(__dirname, 'public/images')));
@@ -19,10 +19,9 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 
+let connectionInstance = null;
 async function getConn(){
-    const db = await conn.createConnection();
-    console.log("Database connected!")
-    return db;
+    return await conn.createConnection(connectionInstance);
  }
 
  //session lifetime
@@ -36,6 +35,7 @@ app.use(sessions({
 app.use(cookieParser());
 var session;
 var disableResponses = false;
+
 
 app.get("/login",(req,res)=>{
 
@@ -52,7 +52,7 @@ app.post("/auth-student",async(req,res)=>{
    
     try{
         //fetching actual username and password from DB
-    db.query('SELECT rollno,dept,name,password FROM student_data WHERE rollno = ? LIMIT 1',[username],async(err,rs)=>{
+    db.query('SELECT rollno,dept,name,password,year FROM student_data WHERE rollno = ? LIMIT 1',[username],async(err,rs)=>{
         if(err) {
             //if error render the same login page again
             res.render('stlogin',{message:'Incorrect UserName or Password'});
@@ -71,12 +71,9 @@ app.post("/auth-student",async(req,res)=>{
              //creating a new property in the session object and assigning its value as current user name
              session.user_id = req.body.username;
              session.dept = rs[0].dept;
-             session.student_name = rs[0].name;
-             
-             //finding batch
-             const splitted = req.body.username.split(/[A-Za-z]/);
-
-             let batch = splitted[0].length == 2 ? splitted[0] : splitted[0].substr(-2);
+             session.student_name = rs[0].name;  
+             let year = rs[0].year;
+             let batch = year.substr(-2);
               
              session.batch = batch;
 
@@ -167,11 +164,11 @@ app.post('/suggestions',async(req,res)=>{
     const db = await getConn();
     await conn.saveSuggestions(db,req.body);
     res.send('Thank you for the feedback')
-})
+});
+
 
 
 app.get('/logout',(req,res)=>{
-
 
     delete req.session.user_id
     delete req.session.dept
@@ -254,15 +251,25 @@ app.post('/create-report',async(req,res)=>{
     const connection = await getConn();
     
     const report = await conn.getReport(connection,req.body);
-    console.log(report);
 
+    const suggestions = await conn.getSuggestions(connection,req.body);
+    
+
+    const cols = ['rollno','dept','sem','suggestion','batch'];
+    const parser = new json2csv({cols});
+    const csvData = parser.parse(suggestions);
+
+    //writing csv data into a file
+    fs.writeFile('reports/suggestions.csv',csvData,(err)=>{
+        if(err) console.log(err);
+    });
+    console.log('csv created');
+    //saving the suggestions into a csv and storing it in the reports folder
     const query = {
         dept:req.body.dept,
         sem:req.body.sem,
         batch: req.body.batch
     };
-
-   
     res.render('final-report',{query,report});
 })
 
@@ -289,7 +296,7 @@ app.get('/admin-logout',(req,res)=>{
     else res.redirect('/admin')
 })
 
-app.listen(process.env.PORT,'192.168.43.168',()=>{
+app.listen(process.env.PORT,()=>{
     console.log(`Server running on port ${process.env.PORT}`);
 });
 

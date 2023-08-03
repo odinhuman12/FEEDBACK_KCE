@@ -7,11 +7,15 @@ const dbConfig = {
   password: 'Mysql26!', 
   database: 'feedback_app',
 };
-async function createConnection() {
-  const connection = mysql.createConnection(dbConfig);
-  return connection;
-}
 
+
+async function createConnection(connectionInstance) {
+  if(!connectionInstance){
+     connectionInstance = mysql.createConnection(dbConfig);
+  }
+  return connectionInstance;
+
+}
 // Function to close the MySQL database connection
 async function closeConnection(connection) {
   await connection.end();
@@ -129,7 +133,7 @@ async function getReport(conn,constraints){
    const dept = constraints.dept;
    const sem = constraints.sem;
    const batch = constraints.batch;
-
+try{
    const query = `
    SELECT
    sub_code,
@@ -258,21 +262,26 @@ async function getReport(conn,constraints){
    await new Promise((resolve,reject)=>{
     conn.query(query,[dept,batch,sem],(err,rs)=>{
       if(err) reject(err);
-      else{
+      else{   
         report = rs;
         resolve(rs);
       }
     })
    });
+  console.log(report);
    return report;
+  }catch(err){
+    console.log(err);
+  }
+  
 }
-
 
 async function saveSuggestions(connection,data){
   console.log(data);
   try{
     let cols = Object.keys(data).join(' VARCHAR(100), ');
     cols = cols.concat(" VARCHAR(100) ");
+    
   await new Promise((resolve,reject)=>{
     connection.query(`CREATE TABLE IF NOT EXISTS students_suggestions (${cols})`,(err,rs)=>{
       if(err) reject(err);
@@ -281,7 +290,7 @@ async function saveSuggestions(connection,data){
   });
   
   const columns = Object.keys(data).join(', ');
-  const placeholders = Object.keys(valuesPlaceholders).map(() => '?').join(', '); //map()=>'?' will replace the string into '?'
+  const placeholders = Object.keys(data).map(() => '?').join(', '); //map()=>'?' will replace the string into '?'
   // console.log(columns);
   // console.log(placeholders);
   const insertQuery = `INSERT INTO students_suggestions (${columns}) VALUES (${placeholders})`;
@@ -301,15 +310,37 @@ async function saveSuggestions(connection,data){
   
 }
 
-
-
+async function getSuggestions(connection,constraints){
+   const dept = constraints.dept;
+   const sem = constraints.sem;
+   const batch = constraints.batch;
+   let suggestions;
+   try{
+   
+    //fetching the student's suggestions data and storing it in a csv
+    await new Promise((reject,resolve)=>{
+      connection.query(`SELECT * FROM students_suggestions WHERE dept=? AND batch=? AND sem=?`,[dept,batch,sem],(err,rs)=>{
+       if(err) reject(err);
+       else{
+         suggestions = rs;
+         resolve(rs);
+       }
+     })
+    });
+   }catch(err){
+    console.log(err);
+   }
+   return suggestions;
+}
 
 module.exports = {
+  
   createConnection,
   closeConnection,
   insertCSVData,
   fetchEnrolledCourses,
   saveFeedback,
   getReport,
-  saveSuggestions
+  saveSuggestions,
+  getSuggestions
 };
