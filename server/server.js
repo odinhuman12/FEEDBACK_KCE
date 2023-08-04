@@ -9,6 +9,7 @@ const multer=require('multer');
 const csvParser=require('csv-parser');
 const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
+const { resourceLimits } = require("worker_threads");
 const json2csv = require('json2csv').Parser;
 
 const upload=multer({dest:'uploads'});
@@ -38,8 +39,7 @@ var disableResponses = false;
 
 
 app.get("/login",(req,res)=>{
-
-    res.render('stlogin',{message:''});
+    res.render('stlogin',{message:'',completed:'No'});
 });
 
 
@@ -51,8 +51,18 @@ app.post("/auth-student",async(req,res)=>{
     const db = await getConn();
    
     try{
+        let disableResponses;
+        await new Promise((resolve,reject)=>{
+            db.query(`SELECT disableResponses from auth WHERE username = ?`,['admin'],(err,rs)=>{
+                if(err) reject(err);
+                else{
+                    disableResponses = rs[0].disableResponses;
+                    resolve();
+                }
+            })
+        })
         //fetching actual username and password from DB
-    db.query('SELECT rollno,dept,name,password,year FROM student_data WHERE rollno = ? LIMIT 1',[username],async(err,rs)=>{
+      db.query('SELECT rollno,dept,name,password,year FROM student_data WHERE rollno = ? LIMIT 1',[username],async(err,rs)=>{
         if(err) {
             //if error render the same login page again
             res.render('stlogin',{message:'Incorrect UserName or Password'});
@@ -60,7 +70,7 @@ app.post("/auth-student",async(req,res)=>{
         else{
             //if length is zero which means user doesn't exists
         if(rs.length == 0) res.render("stlogin",{message:"Incorrect User-name or Password"})
-        else if(disableResponses) res.render('stlogin',{message: 'Currently not accepting responses'});
+        else if(disableResponses=='1') res.render('stlogin',{message: 'Currently not accepting responses',completed:'No'});
         else {
             // console.log(rs);
            if(password == rs[0].password){
@@ -163,7 +173,7 @@ app.post('/rating',async(req,res)=>{
 app.post('/suggestions',async(req,res)=>{
     const db = await getConn();
     await conn.saveSuggestions(db,req.body);
-    res.send('Thank you for the feedback')
+    res.redirect('/logout');
 });
 
 
@@ -288,9 +298,64 @@ async function saveData(csvData){
     
 };
 
-app.get('/admin-logout',(req,res)=>{
+
+//serving the downloadable file to the user
+app.get('/download/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const file = path.join(__dirname, 'reports', filename);
+  
+    // Check if the file exists
+    if (fs.existsSync(file)) {
+      res.download(file);
+    } else {
+      res.status(404).send('File not found');
+    }
+  });
+
+
+app.get('/change-state',async(req,res)=>{
+    const db = await getConn();
+    const admin = req.session.admin_id;
+    if(admin){
+        let currentState;
+        await new Promise((resolve,reject)=>{
+            db.query(`SELECT disableResponses FROM auth WHERE username=?`,[admin],(err,rs)=>{
+                if(err) reject(err);
+                else{
+                    currentState = rs[0].disableResponses;
+                    resolve();
+                }
+            })
+        });
+        //inverting the current state
+        let changedState = currentState == '0' ? '1' : '0';
+
+        await new Promise((resolve,reject)=>{
+            db.query(`UPDATE auth SET disableResponses = ? where username = ?`,[changedState,admin],(err,rs)=>{
+                if(err) reject(err);
+                else{
+                    resolve(rs);
+                }
+            })
+        });
+        res.send("State changed")
+    }
+    else res.redirect('/admin')
+   
+})
+
+app.get('/admin-logout',async(req,res)=>{
     if(req.session.admin_id) {
         delete req.session.admin_id;
+        const db = await getConn();
+        await new Promise((resolve,reject)=>{
+            db.query(`UPDATE auth SET disableResponses = ? where username = ?`,['0','admin'],(err,rs)=>{
+                if(err) reject(err);
+                else{
+                    resolve(rs);
+                }
+            })
+        });
        res.redirect('/admin');
     }
     else res.redirect('/admin')

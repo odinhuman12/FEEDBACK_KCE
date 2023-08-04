@@ -6,6 +6,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
+<style>
+  .state-btn{
+    margin-left: 1200px;
+  }
+</style>
 
 <body class="bg-gradient-to-br from-purple-600 via-pink-500 to-red-500">
   <nav class="bg-white shadow-md">
@@ -14,16 +19,21 @@
         <div class="font-semibold text-xl">Admin Dashboard</div>
         <ul class="flex space-x-4">
           <li class="nav-item active">
-            <a href="#" class="text-gray-700 hover:text-purple-600 font-medium">Home</a>
+            <a href="#" class="text-gray-700 hover:text-purple-600 font-medium " style="color:blueviolet">Home</a>
           </li>
           <li class="nav-item">
             <a href="/report" class="text-gray-700 hover:text-purple-600 font-medium">Report</a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin-logout" class="text-gray-700 hover:text-purple-600 font-medium">Logout</a>
           </li>
         </ul>
       </div>
     </div>
   </nav>
-
+  <div class="state-btn">
+    <button onclick="changeState()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" id="disable-btn">Disable Responses</button>
+  </div>
   <div class="flex items-center justify-center h-screen">
     <div class="w-full max-w-sm">
       <div class="bg-white shadow-md rounded-lg px-8 py-10">
@@ -33,7 +43,7 @@
               <h4 style="border: 2px solid rgb(131, 184, 53); padding: 10px; width: 200px; text-align: center;"><%= message %></h4>
              <% } %>
           <input type="file" name="csvfile">
-          <button id="uploadBtn" type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" type="button">
+          <button id="uploadBtn" type="submit" class="bg-purple-600 hover:bg-red-700 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" type="button">
             Upload 
           </button>
         </form>
@@ -42,6 +52,16 @@
     </div>
   </div>
 </body>
-
-
+<script>
+  function changeState(){
+    const disable_btn = document.getElementById('disable-btn');
+    disable_btn.innerText = disable_btn.innerText == 'Enable Responses' ? 'Disable Responses' : 'Enable Responses';
+    sendAjaxRequest();
+  }
+  function sendAjaxRequest(){
+    httpRequest = new XMLHttpRequest();
+    httpRequest.open("GET","/change-state");
+    httpRequest.send();
+  }
+</script>
 </html>

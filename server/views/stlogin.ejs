@@ -85,18 +85,11 @@
    
   </div>
 
-
-
-  <script>
-    function passRollNumber() {
-      const username = document.getElementById("username").value;
-      console.log(username);
-      const url = `question.html?roll=${encodeURIComponent(username)}`;
-      window.location.href = url;
-      return false; 
-    }
-    
-  </script>
+  <%  if(completed == 'yes'){ %>
+    <script>
+      alert("Thank you for the feedback")
+    </script>
+  <% } %>
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>

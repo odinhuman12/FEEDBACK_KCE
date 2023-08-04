@@ -268,7 +268,7 @@ try{
       }
     })
    });
-  console.log(report);
+  // console.log(report);
    return report;
   }catch(err){
     console.log(err);

@@ -2,8 +2,14 @@
     <head>
 
     </head>
+    <style>
+        .content{
+            max-width: 600px;
+            margin: auto;
+        }
+    </style>
     <body>
-        <div style="align-items: center;">
+        <div class="content">
             <h1>Course End Survey FeedBack Report</h1>
     
             <strong>Department:</strong> <%= query.dept %>&nbsp; <strong>Semester:</strong> <%= query.sem %>&nbsp; <strong>Batch:</strong> <%= query.batch %>
@@ -232,10 +238,13 @@
             <br>
 
             <% }) %>
-            <button id="print-btn">Print</button>
+            <button id="print-btn" class="btn btn-primary">Print</button>
+            <br>
+            <a href="download/suggestions.csv" download="students_suggestions">Download student suggestions</a>
         </div>
        
-
+   
+   
     </body>
     <script>
         const printButton = document.getElementById('print-btn');
