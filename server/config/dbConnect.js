@@ -48,7 +48,7 @@ async function insertCSVData(connection, csvData) {
         } 
       });
     });
-    console.log("Table created");
+    // console.log("Table created");
 
 
     // Prepare the INSERT query with placeholders
@@ -121,10 +121,10 @@ async function saveFeedback(connection,user_data){
       }
     })
   });
-  console.log("Feedback data inserted!");
+  // console.log("Feedback data inserted!");
   } catch(err){
     console.log(err);
-    console.log("Error occured");
+    // console.log("Error occured");
   }
 }
 
@@ -302,7 +302,7 @@ async function saveSuggestions(connection,data){
       else resolve(rs);
     })
   });
-  console.log("Suggestions inserted into db");
+  // console.log("Suggestions inserted into db");
 
   } catch(err){
     console.log(err);
