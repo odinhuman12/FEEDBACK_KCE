@@ -1,19 +1,31 @@
 <html>
     <head>
-
+       
     </head>
     <style>
         .content{
             max-width: 600px;
             margin: auto;
         }
+    /* print.css */
+
+    @page {
+      size: auto; /* Automatically determine the page size */
+     margin: 0; /* Set margins to 0 to remove the default header and footer */
+    }
+
+    body {
+       margin: 1cm; /* Set the body margin to give some space around the content */
+    }
+
     </style>
     <body>
         <div class="content">
             <h1>Course End Survey FeedBack Report</h1>
     
             <strong>Department:</strong> <%= query.dept %>&nbsp; <strong>Semester:</strong> <%= query.sem %>&nbsp; <strong>Batch:</strong> <%= query.batch %>
-
+            <strong style="margin-left: 200px;">Date: </strong> <%= date %>
+            
             <% report.forEach((course)=> {  %>
             <br>
             <br>

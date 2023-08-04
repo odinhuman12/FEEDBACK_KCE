@@ -65,11 +65,11 @@ app.post("/auth-student",async(req,res)=>{
       db.query('SELECT rollno,dept,name,password,year FROM student_data WHERE rollno = ? LIMIT 1',[username],async(err,rs)=>{
         if(err) {
             //if error render the same login page again
-            res.render('stlogin',{message:'Incorrect UserName or Password'});
+            res.render('stlogin',{message:'Incorrect UserName or Password',completed:'No'});
         }
         else{
             //if length is zero which means user doesn't exists
-        if(rs.length == 0) res.render("stlogin",{message:"Incorrect User-name or Password"})
+        if(rs.length == 0) res.render("stlogin",{message:"Incorrect User-name or Password",completed:'No'})
         else if(disableResponses=='1') res.render('stlogin',{message: 'Currently not accepting responses',completed:'No'});
         else {
             // console.log(rs);
@@ -257,7 +257,9 @@ app.get('/report',(req,res)=>{
 });
 
 app.post('/create-report',async(req,res)=>{
-   
+
+    try{
+        
     const connection = await getConn();
     
     const report = await conn.getReport(connection,req.body);
@@ -268,19 +270,38 @@ app.post('/create-report',async(req,res)=>{
     const cols = ['rollno','dept','sem','suggestion','batch'];
     const parser = new json2csv({cols});
     const csvData = parser.parse(suggestions);
+    
 
     //writing csv data into a file
     fs.writeFile('reports/suggestions.csv',csvData,(err)=>{
         if(err) console.log(err);
     });
     console.log('csv created');
+
+
     //saving the suggestions into a csv and storing it in the reports folder
     const query = {
         dept:req.body.dept,
         sem:req.body.sem,
         batch: req.body.batch
     };
-    res.render('final-report',{query,report});
+
+    // Create a new Date object representing the current date and time
+    const currentDate = new Date();
+
+    // Get the various components of the date
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth() + 1; // Months are zero-based, so add 1
+    const day = currentDate.getDate();
+    const date = `${year}-${month}-${day}`;
+    // console.log(date);
+
+    res.render('final-report',{query,report,date});
+    } catch(err){
+        console.log(err);
+        
+    }
+   
 })
 
 
